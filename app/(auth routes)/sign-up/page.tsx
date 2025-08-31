@@ -3,7 +3,7 @@ import { AxiosError } from 'axios';
 import { FormEvent, useState } from "react";
 import { loginUser, registerUser } from "../../../lib/api/clientApi";
 import { useRouter } from "next/navigation";
-import css from "./SignUpPage.module.css";
+import css from "../sign-up/SignUpPage.module.css";
 import { useAuthStore } from "../../../lib/store/authStore";
 
 export default function SignUpPage() {

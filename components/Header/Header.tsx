@@ -1,30 +1,30 @@
+import { AuthNavigation } from '../AuthNavigation/AuthNavigation';
+import TagsMenu from '../TagsMenu/TagsMenu';
 import css from './Header.module.css';
 import Link from 'next/link';
-import TagsMenu from '../TagsMenu/TagsMenu';
 
-
-export default function Header() {
+const Header = () => {
   return (
     <header className={css.header}>
-      <Link href="/" aria-label="Home">
-        NoteHub
+      <Link className={css.headerLink} href="/" aria-label="Home">
+        Note<span>Hub</span>
       </Link>
       <nav aria-label="Main Navigation">
         <ul className={css.navigation}>
-          <li>
-            <Link href="/">Home</Link>
+          <li className={css.navigationItem}>
+            <Link className={css.headerLink} href="/">
+              Home
+            </Link>
           </li>
-          <li>
-            <TagsMenu/>
+          <li className={css.navigationItem}>
+            <TagsMenu />
           </li>
-          <li>
-            <Link href="/profile">Profile</Link>
-          </li>
-          <li>
-            <Link href="/about">About</Link>
-          </li>
+
+          <AuthNavigation />
         </ul>
       </nav>
     </header>
   );
-}
+};
+
+export default Header;
