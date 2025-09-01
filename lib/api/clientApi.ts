@@ -74,12 +74,13 @@ export async function getMe(): Promise<User> {
 }
 
 // обновляем сигнатуру функции
-export async function updateMe(username: string): Promise<User> {
+export async function updateMe(payload: { username: string }): Promise<User> {
   try {
-    const { data } = await api.put('/users/me', { username });
+    const { data } = await api.put("/users/me", payload);
     return data;
   } catch (error) {
     logErrorResponse(error);
     throw error;
   }
 }
+

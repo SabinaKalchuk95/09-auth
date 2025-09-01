@@ -1,9 +1,9 @@
 'use client';
 
-import Link from 'next/link';
-import { useAuthStore } from '@/lib/store/authStore';
-import { useRouter } from 'next/navigation';
-import { logoutUser } from '@/lib/api/clientApi';
+import Link from "next/link";
+import { useAuthStore } from "@/lib/store/authStore";
+import { useRouter } from "next/navigation";
+import { logoutUser } from "@/lib/api/clientApi";
 
 export function AuthNavigation() {
   const { user, setUser } = useAuthStore();
@@ -13,7 +13,7 @@ export function AuthNavigation() {
     try {
       await logoutUser();
       setUser(null);
-      router.push('/sign-in');
+      router.push("/sign-in");
     } catch (err) {
       console.error(err);
     }

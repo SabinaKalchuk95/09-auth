@@ -1,52 +1,47 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import css from './EditProfilePage.module.css';
+import { useEffect, useState } from 'react';
 import { getMe, updateMe } from '@/lib/api/clientApi';
-import Image from 'next/image';
-import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/lib/store/authStore';
+import { useRouter } from 'next/navigation';
+import { AxiosError } from 'axios';
+import Image from 'next/image';
+import css from './EditProfilePage.module.css';
 
 export default function EditProfilePage() {
   const router = useRouter();
+  const setUser = useAuthStore((state) => state.setUser);
 
   const [userName, setUserName] = useState('');
   const [userEmail, setUserEmail] = useState('');
   const [userImage, setUserImage] = useState('');
-
   const [error, setError] = useState('');
 
-  const setUser = useAuthStore((state) => state.setUser);
-
   useEffect(() => {
-    async function fetchMe() {
-      await getMe().then((user) => {
-        if (user) {
-          setUserName(user.username);
-          setUserEmail(user.email);
-          setUserImage(user.avatar ?? '');
-        }
-      });
+    async function fetchMeData() {
+      try {
+        const user = await getMe();
+        setUserName(user.username);
+        setUserEmail(user.email);
+        setUserImage(user.avatar || '');
+      } catch {
+        setError('Failed to load profile');
+      }
     }
-    fetchMe();
+    fetchMeData();
   }, []);
 
-  function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
-    setUserName(event.target.value);
-  }
-
-  async function handleSave(event: React.FormEvent<HTMLFormElement>) {
-  event.preventDefault();
-  try {
-    // передаём просто строку
-    const res = await updateMe(userName);
-    setUser(res);
-    router.push('/profile');
-  } catch (error) {
-    setError(String(error));
-  }
-}
-
+  const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    try {
+      const updatedUser = await updateMe({ username: userName });
+      setUser(updatedUser);
+      router.push('/profile');
+    } catch (err) {
+      const axiosError = err as AxiosError<{ error: string }>;
+      setError(axiosError.response?.data?.error || 'Error');
+    }
+  };
 
   return (
     <main className={css.mainContent}>
@@ -70,25 +65,16 @@ export default function EditProfilePage() {
               type="text"
               className={css.input}
               value={userName}
-              onChange={handleChange}
+              onChange={(e) => setUserName(e.target.value)}
             />
           </div>
 
           <p>Email: {userEmail}</p>
-
           {error && <p className={css.error}>{error}</p>}
 
           <div className={css.actions}>
-            <button type="submit" className={css.saveButton}>
-              Save
-            </button>
-            <button
-              type="button"
-              className={css.cancelButton}
-              onClick={router.back}
-            >
-              Cancel
-            </button>
+            <button type="submit" className={css.saveButton}>Save</button>
+            <button type="button" className={css.cancelButton} onClick={router.back}>Cancel</button>
           </div>
         </form>
       </div>

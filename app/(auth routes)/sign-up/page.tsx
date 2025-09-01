@@ -1,36 +1,37 @@
-"use client";
+'use client';
+
+import { FormEvent, useState } from 'react';
+import { registerUser } from '@/lib/api/clientApi';
+import { useRouter } from 'next/navigation';
+import { useAuthStore } from '@/lib/store/authStore';
 import { AxiosError } from 'axios';
-import { FormEvent, useState } from "react";
-import { loginUser, registerUser } from "../../../lib/api/clientApi";
-import { useRouter } from "next/navigation";
-import css from "../sign-up/SignUpPage.module.css";
-import { useAuthStore } from "../../../lib/store/authStore";
+import css from './SignUpPage.module.css';
 
 export default function SignUpPage() {
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
   const router = useRouter();
-  const { setUser } = useAuthStore();
+  const setUser = useAuthStore((state) => state.setUser);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const form = e.currentTarget;
-    const email = form.email.value;
-    const password = form.password.value;
+    const email = (form.elements.namedItem('email') as HTMLInputElement).value;
+    const password = (form.elements.namedItem('password') as HTMLInputElement).value;
 
     try {
-      const user = await loginUser(email, password); // или registerUser
+      const user = await registerUser(email, password);
       setUser(user);
-      router.push("/profile");
-    } catch (err: unknown) {
-      const error = err as AxiosError<{ error: string }>;
-      setError(error.response?.data?.error || "Error");
+      router.push('/profile');
+    } catch (err) {
+      const axiosError = err as AxiosError<{ error: string }>;
+      setError(axiosError.response?.data?.error || 'Error');
     }
   };
 
   return (
     <main className={css.mainContent}>
-      <h1 className={css.formTitle}>Sign up</h1>
-      <form onSubmit={handleSubmit} className={css.form}>
+      <form className={css.form} onSubmit={handleSubmit}>
+        <h1 className={css.formTitle}>Sign up</h1>
         <div className={css.formGroup}>
           <label htmlFor="email">Email</label>
           <input id="email" type="email" name="email" required className={css.input} />
@@ -42,7 +43,7 @@ export default function SignUpPage() {
         <div className={css.actions}>
           <button type="submit" className={css.submitButton}>Register</button>
         </div>
-        <p className={css.error}>{error}</p>
+        {error && <p className={css.error}>{error}</p>}
       </form>
     </main>
   );
